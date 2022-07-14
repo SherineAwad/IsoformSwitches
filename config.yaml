@@ -1,0 +1,22 @@
+#---------------------------------------------------
+#General Parameters 
+#---------------------------------------------------
+TREAT: "PL_treat.txt"
+CONTROL: "wildtype.txt"
+TREAT_NAME: "PL" 
+CONTROL_NAME: "wildtype"
+WORKDIR: '/rds/project/rds-O11U8YqSuCk/SM/SLX-21015_2'
+N: 3 #Number of replicates
+MEMORY: "-Xmx20g" #for 20giga, change as much giga as you have 
+#---------------------------------------------------------------
+#Choose whether to do genome level or at transcripts level
+#---------------------------------------------------------------
+LEVEL: TRANSCRIPTS #For genome level analysis use GENOME, change to TRANSCRIPTS for transcripts level analysis
+#-------------------------------------------------------------------------
+#Change this set of parameters if you wish to run at transcripts level
+#-------------------------------------------------------------------------
+TRANSCRIPTS: "gencode.v40.transcripts.fa" 
+SALMON_INDEX: "SalmonGRCh38GenoIndex" 
+SALMON_LIBRARY: ISR #strand see Salmon documentation 
+TX2GENE: "Ensembltx2gene.txt" 
+TXGTF: "gencode.v40.chr_patch_hapl_scaff.annotation.gtf.gz"
