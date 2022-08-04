@@ -14,17 +14,21 @@ The pipeline detects alternative splicing and differential isoform switchs. In a
 ### Output Example 
 
 
-Alternative Splicing ::
+Gene Specific Plots ::
 
-    xfun::embed_file("splicingexample.pdf")
+   ![RNF2.png](RNF2.png)
 
-Consequence Summary:: 
+Splicing Summary:: 
    
-    xfun::embed_file("ConsequenceSummary.pdf")
+   ![splicingsummary.png ](splicingsummary.png)
 
 Consequence Enrichment:: 
 
-   xfun::embed_file("ConsequenceEnrichment.pdf")
+   ![consequencenrichment.png](consequencenrichment.png)
+
+Volcaon Plots:: 
+
+   ![volcanoplots.png](volcanoplots.png)
 
 
 ### Run the pipeline 
