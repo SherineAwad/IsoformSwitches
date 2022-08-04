@@ -8,6 +8,24 @@ Snakemake Workflow for Isoform Switches
 ===========================================
 
 This is a snakemake pipeline to detect isoform switches from RNASeq data. The pipeline is in progress. It uses IsoformSwitchAnalyzer tool so far. 
+The pipeline detects alternative splicing and differential isoform switchs. In addition, it relies on some external sources to analyze the consequences of those switches, including coding potential, ORF similarity, Intron retention, etc. 
+
+
+### Output Example 
+
+
+Alternative Splicing ::
+
+    xfun::embed_file("splicingexample.pdf")
+
+Consequence Summary:: 
+   
+    xfun::embed_file("ConsequenceSummary.pdf")
+
+Consequence Enrichment:: 
+
+   xfun::embed_file("ConsequenceEnrichment.pdf")
+
 
 ### Run the pipeline 
 
