@@ -91,6 +91,8 @@ mySwitchList <- analyzeIntronRetention(
 summary(mySwitchList) 
 
 
+system('python /rds/project/rds-O11U8YqSuCk/SM/tools/CPC2_standalone-1.0.1/bin/CPC2.py -i isoformSwitchAnalyzeR_isoform_nt.fasta -o cpc2output', wait = FALSE)
+
 mySwitchList <- analyzeCPC2( mySwitchList, 'cpc2output.txt',
     removeNoncodinORFs = TRUE,
     codingCutoff = 0.725,
