@@ -14,11 +14,11 @@ The pipeline detects alternative splicing and differential isoform switchs. In a
 ### Output Example 
 
 
-Gene Specific Plots ::
+#### Gene Specific Plots ::
 
    ![RNF2.png](RNF2.png)
 
-Splicing Summary:: 
+#### Splicing Summary 
    
    ![splicingsummary.png ](splicingsummary.png)
 
@@ -26,9 +26,16 @@ Consequence Enrichment::
 
    ![consequencenrichment.png](consequencenrichment.png)
 
-Volcaon Plots:: 
+#### Volcano Plots 
 
    ![volcanoplots.png](volcanoplots.png)
+
+#### Gene Enrichment 
+   ![genenrichment.png](genenrichment.png)
+
+#### Genome Wide
+
+   ![genomewide.png](genomewide.png)
 
 
 ### Run the pipeline 
