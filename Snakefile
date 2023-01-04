@@ -11,9 +11,12 @@ print(CONTROL)
 
 rule all: 
      input: 
-         expand("{group}_SALMON.{sample}/quant.sf", sample = TREAT, group = config['TREAT_NAME']), 
-         expand("{group}_SALMON.{sample}/quant.sf", sample = CONTROL, group = config['CONTROL_NAME']),
-         "dexseq_isoformsfeatures.csv"
+         #expand("{group}_SALMON.{sample}/quant.sf", sample = TREAT, group = config['TREAT_NAME']), 
+         #expand("{group}_SALMON.{sample}/quant.sf", sample = CONTROL, group = config['CONTROL_NAME']),
+         "dexseq_isoformsfeatures.csv", 
+
+
+
 rule quant:  
       input: 
             r1 = "galore/{sample}.r_1_val_1.fq.gz",
@@ -34,4 +37,7 @@ rule isoform:
       output: 
          "dexseq_isoformsfeatures.csv"
       shell: 
-           "Rscript splice.R"
+           "Rscript splice_all.R"
+
+
+

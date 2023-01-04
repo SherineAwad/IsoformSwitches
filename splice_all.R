@@ -6,14 +6,14 @@ args = commandArgs(trailingOnly=TRUE)
 salmonQuant <- importIsoformExpression( parentDir ="/rds/project/rds-O11U8YqSuCk/SM/SLX-21015_2")
 summary(salmonQuant)
 myDesign <- data.frame(
-    sampleID = colnames(salmonQuant$abundance)[-1],
+   sampleID = colnames(salmonQuant$abundance)[-1],
     condition = c("E601K","E601K","E601K","RNAb","RNAb","RNAb","RNAb","RNAb","WT","WT","WT")
 )
 
+conditions <- data.frame(condition_1 =c("WT", "WT") ,condition_2= c("RNAb", "E601K") )
+myDesign 
 
-myDesign
-#condition = gsub('_.*', '', colnames(salmonQuant$abundance)[-1])
-#condition = c("E601K","E601K","E601K","RNAb","RNAb","RNAb","RNAb","RNAb","WT","WT","WT"),     
+conditions 
 
 mySwitchList <- importRdata(
     isoformCountMatrix   = salmonQuant$counts,
@@ -22,7 +22,8 @@ mySwitchList <- importRdata(
     isoformExonAnnoation = "gencode.v40.chr_patch_hapl_scaff.annotation.gtf",
     isoformNtFasta       = "gencode.v40.transcripts.fa",
     showProgress = TRUE,
-    ignoreAfterBar = TRUE
+    ignoreAfterBar = TRUE,
+    comparisonsToMake=conditions 
 )
 
 head(mySwitchList$isoformFeatures,2)
@@ -127,13 +128,15 @@ mySwitchList <- analyzeSwitchConsequences(
 )
 
 pdf(file = 'ConsequenceSummary.pdf', onefile = TRUE, height=6, width = 9)
-extractConsequenceSummary(
+consq_summary <- extractConsequenceSummary(
     mySwitchList,
-    consequencesToAnalyze='all',
+    consequencesToAnalyze= consequencesOfInterest,
     plotGenes = TRUE,           # enables analysis of genes (instead of isoforms)
-    asFractionTotal = FALSE      # enables analysis of fraction of significant features
+    asFractionTotal = FALSE,      # enables analysis of fraction of significant features
+    returnResult = TRUE
 )
 dev.off()
+write.csv(consq_summary, "consequences_summary.csv")
 
 pdf(file = 'ConsequenceEnrichment.pdf', onefile = TRUE, height=6, width = 9)
 extractConsequenceEnrichment(
@@ -182,7 +185,7 @@ dev.off()
 
 
 pdf(file = 'SwitchOverlap.pdf', onefile = TRUE, height=6, width = 9)
-extractSwitchOverlap(
+switchoverlap <- extractSwitchOverlap(
     mySwitchList,
     filterForConsequences=TRUE,
     alpha = 0.05,
@@ -192,5 +195,39 @@ extractSwitchOverlap(
     plotSwitches = TRUE,
     plotGenes = TRUE
 )
+head(switchoverlap)
+write.csv(switchoverlap, "switchoverlap.csv")
 dev.off()
+
+pdf(file = 'splicingsummary.pdf', onefile = FALSE, height=6, width = 9)
+extractSplicingSummary( mySwitchList,  asFractionTotal = FALSE,
+    plotGenes=TRUE )
+dev.off()
+
+pdf(file = 'GeneEnrichment.pdf', onefile = FALSE, height=6, width = 9)
+extractSplicingEnrichment(
+    mySwitchList,
+    minEventsForPlotting=5,
+    plot = TRUE
+)
+dev.off()
+
+
+
+pdf(file = 'GenomeWide.pdf', onefile = FALSE, height=6, width = 9)
+myIsoforms <- extractSplicingGenomeWide(
+    mySwitchList,
+    featureToExtract = 'isoformUsage',
+    splicingToAnalyze = 'all',
+    alpha=0.05,
+    dIFcutoff = 0.1,
+    log2FCcutoff = 1,
+    violinPlot=TRUE,
+    alphas=c(0.05, 0.001),
+    localTheme=theme_bw(),
+    plot=TRUE,
+)
+dev.off()
+
+
 

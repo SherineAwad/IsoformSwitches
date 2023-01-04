@@ -5,13 +5,17 @@ packageDescription("IsoformSwitchAnalyzeR")$Version
 args = commandArgs(trailingOnly=TRUE)
 
 
-salmonQuant <- importIsoformExpression( parentDir ="/rds/project/rds-O11U8YqSuCk/SM/SLX-21015_2/PL")
+salmonQuant <- importIsoformExpression( parentDir ="/rds/project/rds-O11U8YqSuCk/SM/SLX-21015_2/E60")
 summary(salmonQuant)
 myDesign <- data.frame(
-    sampleID = colnames(salmonQuant$abundance)[-1],
-    condition = c("WT", "WT","WT","RNAb","RNAb","RNAb","RNAb","RNAb") ) 
+   sampleID = colnames(salmonQuant$abundance)[-1],
+   condition = c("E601K", "E601K","E601K", "WT","WT", "WT")
 
+)
 myDesign 
+
+conditions <- data.frame(condition_1 = "WT", condition_2="E601K")
+
 
 mySwitchList <- importRdata(
     isoformCountMatrix   = salmonQuant$counts,
@@ -20,7 +24,8 @@ mySwitchList <- importRdata(
     isoformExonAnnoation = "gencode.v40.chr_patch_hapl_scaff.annotation.gtf",
     isoformNtFasta       = "gencode.v40.transcripts.fa",
     showProgress = TRUE,
-    ignoreAfterBar = TRUE
+    ignoreAfterBar = TRUE,
+    comparisonsToMake=conditions
 )
 
 head(mySwitchList$isoformFeatures,2)
@@ -66,7 +71,7 @@ extractSwitchSummary(mySwitchList)
 
 mySwitchList <- extractSequence(
     mySwitchList, 
-    pathToOutput = '/rds/project/rds-O11U8YqSuCk/SM/SLX-21015_2/PL',
+    pathToOutput = '/rds/project/rds-O11U8YqSuCk/SM/SLX-21015_2/E60',
     writeToFile=TRUE 
 
 )
@@ -91,8 +96,6 @@ mySwitchList <- analyzeIntronRetention(
 summary(mySwitchList) 
 
 
-system('python /rds/project/rds-O11U8YqSuCk/SM/tools/CPC2_standalone-1.0.1/bin/CPC2.py -i isoformSwitchAnalyzeR_isoform_nt.fasta -o cpc2output', wait = FALSE)
-
 mySwitchList <- analyzeCPC2( mySwitchList, 'cpc2output.txt',
     removeNoncodinORFs = TRUE,
     codingCutoff = 0.725,
@@ -108,7 +111,7 @@ mySwitchList <- analyzeCPC2( mySwitchList, 'cpc2output.txt',
 
 #mySwitchList <- analyzeSignalP(
 #    mySwitchList ,
-#    'output_protein_type.txt')
+#    'signalIP_results.txt')
 #)
 
 #mySwitchList <- analyzeIUPred2A(
@@ -118,6 +121,26 @@ mySwitchList <- analyzeCPC2( mySwitchList, 'cpc2output.txt',
 #)
 
 #consequencesOfInterest <- c('intron_retention','coding_potential','NMD_status','domains_identified','ORF_seq_similarity')
+#consequencesOfInterest <- c('intron_retention','coding_potential','signal_peptide_identified','IDR_type') 
+consequencesOfInterest <- c('intron_retention','coding_potential', 'ORF_seq_similarity')
+
+mySwitchList <- analyzeSwitchConsequences(
+    mySwitchList,
+    consequencesToAnalyze = consequencesOfInterest, 
+    dIFcutoff = 0.1, # very high cutoff for fast runtimes - you should use the default (0.1)
+    showProgress=FALSE
+)
+
+mytoplist <- extractTopSwitches(
+    mySwitchList,
+    filterForConsequences = TRUE,
+    n =50,
+    sortByQvals = TRUE
+)
+
+head(mytoplist)
+write.csv(mytoplist, "toplist_E60.csv")
+
 mySwitchList <- analyzeAlternativeSplicing(
    mySwitchList,
     onlySwitchingGenes=TRUE,
@@ -126,10 +149,12 @@ mySwitchList <- analyzeAlternativeSplicing(
     showProgress=TRUE,
     quiet=TRUE
 )
+
+
 summary(mySwitchList$AlternativeSplicingAnalysis)
 
 ### overview of number of intron retentions (IR)
-write.csv(mySwitchList$AlternativeSplicingAnalysis, "AlternativeSplicing_PL.csv") 
+write.csv(mySwitchList$AlternativeSplicingAnalysis, "AlternativeSplicing_E60.csv") 
 
 
 mySwitchList <- analyzeIntronRetention(
@@ -142,7 +167,7 @@ mySwitchList <- analyzeIntronRetention(
 )
 
 ## Analyse consequences
-mySwitchList <- analyzeSwitchConsequences(
+analyzeSwitchConsequences(
     mySwitchList,
     consequencesToAnalyze=c(
         'intron_retention',
@@ -153,16 +178,8 @@ mySwitchList <- analyzeSwitchConsequences(
     quiet=FALSE
 )
 
-write.csv(mySwitchList$switchConsequence, "consequence.csv")
+write.csv(mySwitchList$switchConsequence, "consequences.csv")
 
-mytoplist <- extractTopSwitches(
-    mySwitchList,
-    filterForConsequences = TRUE,
-    n =50,
-    sortByQvals = TRUE
-)
-head(mytoplist)
-write.csv(mytoplist, "toplist_PL.csv")
 
 pdf(file = 'splicingsummary.pdf', onefile = FALSE, height=6, width = 9)
 extractSplicingSummary( mySwitchList,  asFractionTotal = FALSE,
@@ -197,9 +214,11 @@ dev.off()
 # Indiviudal switches
 switchPlotTopSwitches( mySwitchList, n=20, filterForConsequences = TRUE )
 
-pdf(file = 'AMER3.pdf', onefile = TRUE, height=6, width = 9)
-switchPlot(mySwitchList, gene='AMER3')
-dev.off()
+
+##This gene is not found in E60
+#pdf(file = 'AMER3.pdf', onefile = TRUE, height=6, width = 9)
+#switchPlot(mySwitchList, gene='AMER3')
+#dev.off()
 
 
 ### Summary
@@ -238,14 +257,14 @@ ggplot(data=mySwitchList$isoformFeatures, aes(x=gene_log2_fold_change, y=dIF)) +
     theme_bw()
 dev.off()
 
-
-subset(
-    extractTopSwitches(
-        mySwitchList,
-        filterForConsequences = TRUE,
-        n=10,
-        inEachComparison = TRUE
-    )[,c('gene_name','condition_1','condition_2','gene_switch_q_value','Rank')],
-    gene_name == 'AMER3'
-)
+###This gene is not found in E60
+#subset(
+#    extractTopSwitches(
+#        mySwitchList,
+#        filterForConsequences = TRUE,
+#        n=10,
+#        inEachComparison = TRUE
+#    )[,c('gene_name','condition_1','condition_2','gene_switch_q_value','Rank')],
+#    gene_name == 'AMER3'
+#)
 
