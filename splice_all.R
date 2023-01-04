@@ -66,6 +66,9 @@ extractSwitchSummary(mySwitchList)
 mySwitchList <- extractSequence(
     mySwitchList,
     pathToOutput = '/rds/project/rds-O11U8YqSuCk/SM/SLX-21015_2',
+    removeLongAAseq=TRUE, 
+    alsoSplitFastaFile=TRUE,
+    removeShortAAseq=TRUE, 
     writeToFile=TRUE
 
 )
@@ -116,10 +119,12 @@ mySwitchList <- analyzeIntronRetention(
     quiet = FALSE
 )
 
+mySwitchList <-  analyzePFAM( mySwitchList, 'pfam.txt')
 
-#consequencesOfInterest <- c('intron_retention','coding_potential','NMD_status','domains_identified','ORF_seq_similarity')
-consequencesOfInterest <- c('intron_retention','coding_potential', 'ORF_seq_similarity')
+mySwitchList <- analyzeSignalP( mySwitchList, 'output_protein_type.txt')
 
+
+consequencesOfInterest <- c('isoform_seq_similarity','isoform_length','intron_retention','coding_potential','NMD_status','domain_length','domains_identified','ORF_length','ORF_seq_similarity', 'signal_peptide_identified')
 mySwitchList <- analyzeSwitchConsequences(
     mySwitchList,
     consequencesToAnalyze = consequencesOfInterest,
@@ -127,7 +132,7 @@ mySwitchList <- analyzeSwitchConsequences(
     showProgress=FALSE
 )
 
-pdf(file = 'ConsequenceSummary.pdf', onefile = TRUE, height=6, width = 9)
+pdf(file = 'ConsequenceSummary.pdf', onefile = TRUE, height=6, width = 14, pointsize =7)
 consq_summary <- extractConsequenceSummary(
     mySwitchList,
     consequencesToAnalyze= consequencesOfInterest,
