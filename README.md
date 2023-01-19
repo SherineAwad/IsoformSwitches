@@ -91,4 +91,8 @@ or:
     snakemake -j1 configfile config-WGS.yaml 
 
 
+### References 
+
+1. Vitting-Seerup et al. The Landscape of Isoform Switches in Human Cancers. Cancer Res. (2017)
+ 
 
