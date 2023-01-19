@@ -2,22 +2,27 @@
 #General Parameters 
 #---------------------------------------------------
 SAMPLES: "samples.tsv"
+CONTROL: "wildtype.txt"
+TREAT2: "RNAb_treat.txt"
+TREAT1: "E60_treat.txt"
+CONTROL_NAME: "WT"
+TREAT2_NAME: "RNAb"
+TREAT1_NAME: "E60"
 WORKDIR: '/rds/project/rds-O11U8YqSuCk/SM/SLX-21015_2'
-N: 3 #Number of replicates
+SRC: '/rds/project/rds-O11U8YqSuCk/SM/SLX-21015_2/src'
+Nc: 3 #Number of replicates of control 
+Nt1: 3 #Number of replicates of treat1 
+Nt2: 5 #Number of replicates of treat2
+#-----------------------------------------------------------
+# Choose transcripts and organims 
+#-----------------------------------------------------------
+TRANSCRIPTS: "gencode.v40.transcripts.fa"
+SALMON_INDEX: "SalmonGRCh38GenoIndex"
+SALMON_LIBRARY: ISR #strand see Salmon documentation 
+TX2GENE: "gencodetx2gene.txt"
+TXGTF: "gencode.v40.chr_patch_hapl_scaff.annotation.gtf.gz"
+#-----------------------------------------------------------------
+# Choose Computational resources 
+#-----------------------------------------------------------------
 MEMORY: "-Xmx20g" #for 20giga, change as much giga as you have 
 #---------------------------------------------------------------
-#Choose whether to do genome level or at transcripts level
-#---------------------------------------------------------------
-LEVEL: GENOME  #For genome level analysis use GENOME, change to TRANSCRIPTS for transcripts level analysis
-GENOME: "/rds/project/rds-O11U8YqSuCk/SM/annotations/Homo_sapiens/Ensembl/GRCh37/Sequence/WholeGenomeFasta/genome.fa"
-GTF: "/rds/project/rds-O11U8YqSuCk/SM/annotations/Homo_sapiens/Ensembl/GRCh37/Annotation/Genes/genes.gtf"
-STRAND: 2 
-THREADS: 12
-STARINDEX: "/rds/project/rds-O11U8YqSuCk/SM/annotations/StarGRCh37Index"
-#Change this set of parameters if you wish to run at transcripts level
-#-------------------------------------------------------------------------
-TRANSCRIPTS: "gencode.v40.transcripts.fa" 
-SALMON_INDEX: "SalmonGRCh38GenoIndex" 
-SALMON_LIBRARY: ISR #strand see Salmon documentation 
-TX2GENE: "gencodetx2gene.txt" 
-TXGTF: "gencode.v40.chr_patch_hapl_scaff.annotation.gtf.gz"

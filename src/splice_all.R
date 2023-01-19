@@ -1,19 +1,24 @@
 library("IsoformSwitchAnalyzeR")
 
 args = commandArgs(trailingOnly=TRUE)
-
-
-salmonQuant <- importIsoformExpression( parentDir ="/rds/project/rds-O11U8YqSuCk/SM/SLX-21015_2")
+control_condition = args[1]
+treat1_condition = args[2] 
+treat2_condition = args[3] 
+Nc = args[4] 
+Nt1 = args[5] 
+Nt2 =args[6] 
+workdir = getwd()
+salmonQuant <- importIsoformExpression( parentDir =workdir) 
 summary(salmonQuant)
 myDesign <- data.frame(
    sampleID = colnames(salmonQuant$abundance)[-1],
-    condition = c("E601K","E601K","E601K","RNAb","RNAb","RNAb","RNAb","RNAb","WT","WT","WT")
+   condition = c( rep(treat1_condition, Nt1), rep(treat2_condition, Nt2), rep(control_condition, Nc) ) 
 )
-
-conditions <- data.frame(condition_1 =c("WT", "WT") ,condition_2= c("RNAb", "E601K") )
+ 
 myDesign 
 
-conditions 
+conditions <- data.frame(condition_1 =c(control_condition, control_condition), condition_2= c(treat1_condition, treat2_condition) )
+summary(conditions) 
 
 mySwitchList <- importRdata(
     isoformCountMatrix   = salmonQuant$counts,
@@ -65,7 +70,7 @@ extractSwitchSummary(mySwitchList)
 
 mySwitchList <- extractSequence(
     mySwitchList,
-    pathToOutput = '/rds/project/rds-O11U8YqSuCk/SM/SLX-21015_2',
+    pathToOutput = workdir,
     removeLongAAseq=TRUE, 
     alsoSplitFastaFile=TRUE,
     removeShortAAseq=TRUE, 
@@ -121,10 +126,10 @@ mySwitchList <- analyzeIntronRetention(
 
 mySwitchList <-  analyzePFAM( mySwitchList, 'pfam.txt')
 
-mySwitchList <- analyzeSignalP( mySwitchList, 'output_protein_type.txt')
+mySwitchList <- analyzeSignalP( mySwitchList, 'protein_type.txt')
 
-
-consequencesOfInterest <- c('isoform_seq_similarity','isoform_length','intron_retention','coding_potential','NMD_status','domain_length','domains_identified','ORF_length','ORF_seq_similarity', 'signal_peptide_identified')
+consequencesOfInterest <- c('intron_retention','coding_potential', 'ORF_seq_similarity') 
+#consequencesOfInterest <- c('isoform_seq_similarity','isoform_length','intron_retention','coding_potential','NMD_status','domain_length','domains_identified','ORF_length','ORF_seq_similarity', 'signal_peptide_identified')
 mySwitchList <- analyzeSwitchConsequences(
     mySwitchList,
     consequencesToAnalyze = consequencesOfInterest,
@@ -153,7 +158,7 @@ extractConsequenceEnrichment(
     analysisOppositeConsequence=TRUE,
     plot=TRUE,
     localTheme = theme_bw(base_size = 12),
-    minEventsForPlotting = 10,
+    minEventsForPlotting = 5,
 )
 dev.off()
 
@@ -185,8 +190,6 @@ extractSplicingEnrichmentComparison(
     returnResult=FALSE
 )
 dev.off()
-
-#https://bioconductor.org/packages/devel/bioc/vignettes/IsoformSwitchAnalyzeR/inst/doc/IsoformSwitchAnalyzeR.html#predicting-alternative-splicing
 
 
 pdf(file = 'SwitchOverlap.pdf', onefile = TRUE, height=6, width = 9)
@@ -234,5 +237,15 @@ myIsoforms <- extractSplicingGenomeWide(
 )
 dev.off()
 
+mytoplist <- extractTopSwitches(
+    mySwitchList,
+    filterForConsequences = TRUE,
+    n =50,
+    sortByQvals = TRUE
+)
 
+head(mytoplist)
+write.csv(mytoplist, "toplist_all.csv")
+
+switchPlotTopSwitches( mySwitchList, n=20, filterForConsequences = TRUE )
 
